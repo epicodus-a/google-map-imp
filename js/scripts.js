@@ -1,15 +1,45 @@
 // let key = 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE';
 // let jsKey = 'AIzaSyBXgSKzU5-HOLnj6KUboXsZBeKUzDXf0nA';
-
 // format userInput string
-const formatAddress = input => {return input.replace(/\s+/g, '+');};
-const formatType = input => {return input.split(",");};
-
+const formatAddress = input => {
+	return input.replace(/\s+/g, '+');
+};
+const formatType = input => {
+	return input.split(",");
+};
 
 var map;
 var infowindow;
 
-function initMap(myLocation={lat: 45.5230, lng: -122.676}, myType=['store']) {
+function placeDetail(place) {
+	let detail = '';
+	if (place.name) {
+		detail += `<div class="more-info container my-5">
+								<div class="row">
+									<div class="col-12">
+										<h3 class="text-uppercase">${place.name}</h3>`;
+	}
+	if (place.types) {
+		detail += `<h5>This place is about ${place.types.join()}</h5>`;
+	}
+	if (place.rating) {
+		detail += `<h5>Rating: ${place.rating}</h5>`;
+	}
+	if (place.opening_hours) {
+		detail += `<p>It is open</p>
+								</div>
+							</div>
+						</div>`;
+	} else {
+		detail += `<p>It is closed</p>
+								</div>
+							</div>
+						</div>`;
+	}
+	return detail;
+}
+
+function initMap(myLocation = {lat: 45.5230, lng: -122.676}, myType = ['store']) {
 	map = new google.maps.Map(document.getElementById('map'), {
 		center: myLocation,
 		zoom: 15
@@ -28,9 +58,6 @@ function callback(results, status) {
 	if (status === google.maps.places.PlacesServiceStatus.OK) {
 		for (var i = 0; i < results.length; i++) {
 			createMarker(results[i]);
-			// document.getElementById('output').append(results[i]);
-			let list = `<p class="lead my-5">${results[i].name}</p>`;
-			document.getElementById('list').append(results[i].name+"<br>");
 		}
 	}
 }
@@ -38,19 +65,26 @@ function callback(results, status) {
 function createMarker(place) {
 	var placeLoc = place.geometry.location;
 	var marker = new google.maps.Marker({
+		draggable: true,
 		map: map,
-		position: place.geometry.location
+		position: place.geometry.location,
+		animation: google.maps.Animation.DROP,
 	});
 
-	google.maps.event.addListener(marker, 'click', function() {
-		infowindow.setContent("<a href='#list'>"+place.name+"</a>");
+	google.maps.event.addListener(marker, 'click', function () {
+		infowindow.setContent("<a href='#detail'>" + place.name + "</a>");
+		console.log(place);
 		infowindow.open(map, this);
+		document.getElementById('detail').innerHTML = placeDetail(place);
 	});
 }
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function () {
+	$(".place").click(function () {
+		$(".detail").append('something');
+	});
 	$(".search-form").submit(function (e) {
 		e.preventDefault();
 		let inputAddress = formatAddress($("#location").val());
@@ -58,9 +92,6 @@ $(document).ready(function () {
 		// let url = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/geocode/json';
 		let url = 'https://maps.googleapis.com/maps/api/geocode/json';
 		$.ajax({
-			// beforeSend: function (request) {
-			// 	request.setRequestHeader("Authorization", "Negotiate");
-			// },
 			async: true,
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
@@ -77,7 +108,7 @@ $(document).ready(function () {
 			},
 			success: function (data, textStatus, jqXHR) {
 				let myLocation = data.results[0].geometry.location;
-				initMap(myLocation,inputType);
+				initMap(myLocation, inputType);
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
 				console.log(textStatus);
