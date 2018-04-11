@@ -58,12 +58,15 @@ $(document).ready(function () {
 		// let url = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/geocode/json';
 		let url = 'https://maps.googleapis.com/maps/api/geocode/json';
 		$.ajax({
-			beforeSend: function (request) {
-				request.setRequestHeader("Authorization", "Negotiate");
-			},
+			// beforeSend: function (request) {
+			// 	request.setRequestHeader("Authorization", "Negotiate");
+			// },
 			async: true,
 			headers: {
 				'Content-Type': 'application/x-www-form-urlencoded'
+			},
+			xhrFields: {
+				withCredentials: false
 			},
 			url: url,
 			dataType: 'json',
