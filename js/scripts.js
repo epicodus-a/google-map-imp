@@ -1,36 +1,63 @@
-//
-// const convertUserInput = addressStr => {
-// 	let addressArray = addressStr.split(",");
-// 	let result = '';
-// 	addressArray.forEach((element, index) => {
-// 		if (index < addressArray.length - 1){
-// 			result += element+'+';
-// 		} else{
-// 			result += element;
-// 		}
-// 	});
-// 	return result;
-// };
+// format userInput string into 'input1+inputb+inputc'
+const formatUserInput = input => {return input.replace(/\s+/g, '+');};
 
-const convertUserInput2 = input => {return input.replace(/\s+/g, '+');};
+// This example requires the Places library. Include the libraries=places
+// parameter when you first load the API. For example:
+// <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places">
 
-// alert(convertUserInput2('valeu portland food'));
-// get data from google map api
+var map;
+var infowindow;
+// var myLocation = {lat: -33.867, lng: 151.195};
+// var myType =['store'];
+
+function initMap(myLocation={lat: -33.867, lng: 151.195}, myType=['store']) {
+
+	map = new google.maps.Map(document.getElementById('map'), {
+		center: myLocation,
+		zoom: 15
+	});
+
+	infowindow = new google.maps.InfoWindow();
+	var service = new google.maps.places.PlacesService(map);
+	service.nearbySearch({
+		location: myLocation,
+		radius: 500,
+		type: myType,
+	}, callback);
+}
+
+function callback(results, status) {
+	if (status === google.maps.places.PlacesServiceStatus.OK) {
+		for (var i = 0; i < results.length; i++) {
+			createMarker(results[i]);
+			// document.getElementById('output').append(results[i]);
+			document.getElementById('output').append(results[i].name);
+		}
+	}
+}
+
+function createMarker(place) {
+	var placeLoc = place.geometry.location;
+	var marker = new google.maps.Marker({
+		map: map,
+		position: place.geometry.location
+	});
+
+	google.maps.event.addListener(marker, 'click', function() {
+		infowindow.setContent(place.name);
+		infowindow.open(map, this);
+	});
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 $(document).ready(function () {
-	// var newAddress;
 	$(".search-form").submit(function (e) {
 		e.preventDefault();
-		// var keywords = convertUserInput2($("#type").val());
-		var query = convertUserInput2($("#location").val());
-		// var url2 = 'https://maps.googleapis.com/maps/api/geocode/json';
-		var url2 = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/place/textsearch/json';
-
+		var query = formatUserInput($("#location").val());
+		var url = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/place/textsearch/json';
 		$.ajax({
-			url: url2,
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded'
-			},
-			// async: false,
+			url: url,
 			dataType: 'json',
 			type: 'GET',
 			data: {
@@ -38,68 +65,21 @@ $(document).ready(function () {
 				key: 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE',
 			},
 			success: function (data, textStatus, jqXHR) {
-				// newAddress = [data.results[0].geometry.location.lat, data.results[0].geometry.location.lng];
-				console.log(data);
+				console.log()
 			},
 			error: function (jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR);
-				console.log(textStatus);
-				console.log(errorThrown);
+				// console.log(jqXHR);
 			}
 		});
+
+		let key = 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE';
+		let jsKey = 'AIzaSyBXgSKzU5-HOLnj6KUboXsZBeKUzDXf0nA';
+
+
+		'https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE'
+
+
+
+		// $("#map").append(map);
 	});
 });
-		// $.ajax({
-		// 	url: url2,
-		// 	headers: {
-		// 		'Content-Type': 'application/x-www-form-urlencoded'
-		// 	},
-		// 	async: false,
-		// 	dataType: 'json',
-		// 	type: 'GET',
-		// 	data: {
-		// 		address: address,
-		// 		key: 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE',
-		// 	},
-		// 	success: function (data, textStatus, jqXHR) {
-		// 		newAddress = [data.results[0].geometry.location.lat, data.results[0].geometry.location.lng];
-		// 		console.log(newAddress);
-		// 	},
-		// 	error: function (jqXHR, textStatus, errorThrown) {
-		// 		console.log(jqXHR);
-		// 		console.log(textStatus);
-		// 		console.log(errorThrown);
-		// 	}
-		// });
-
-	//
-	// 	var url = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/place/search/json';
-	// 	$.ajax({
-	// 		url: url,
-	// 		headers: {
-	// 			'Content-Type': 'application/x-www-form-urlencoded'
-	// 		},
-	// 		async: false,
-	// 		dataType: 'json',
-	// 		type: 'GET',
-	// 		data: {
-	// 			location: newAddress[0] +", "+ newAddress[1],
-	// 			radius: 1000,
-	// 			name: keywords,
-	// 			key: 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE',
-	// 			sensor: 'false'
-	// 		},
-	// 		success: function (data, textStatus, jqXHR) {
-	// 			console.log(data);
-	// 		},
-	// 		error: function (jqXHR, textStatus, errorThrown) {
-	// 			console.log(jqXHR);
-	// 			console.log(textStatus);
-	// 			console.log(errorThrown);
-	// 		}
-	// 	});
-	// });
-	// var url2 = 'https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE';
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-// });
