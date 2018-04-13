@@ -1,15 +1,10 @@
-// let key = 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE';
-// let jsKey = 'AIzaSyBXgSKzU5-HOLnj6KUboXsZBeKUzDXf0nA';
-// format userInput string
-const formatAddress = input => {
-	return input.replace(/\s+/g, '+');
-};
-const formatType = input => {
-	return input.split(",");
-};
 
-var map;
-var infowindow;
+// format userInput string
+const formatAddress = input => input.replace(/\s+/g, '+');
+const formatType = input => input.split(",");
+
+let map;
+let infowindow;
 
 function placeDetail(place) {
 	let detail = '';
@@ -46,7 +41,7 @@ function initMap(myLocation = {lat: 45.5230, lng: -122.676}, myType = ['store'])
 	});
 
 	infowindow = new google.maps.InfoWindow();
-	var service = new google.maps.places.PlacesService(map);
+	let service = new google.maps.places.PlacesService(map);
 	service.nearbySearch({
 		location: myLocation,
 		radius: 500,
@@ -89,7 +84,6 @@ $(document).ready(function () {
 		e.preventDefault();
 		let inputAddress = formatAddress($("#location").val());
 		let inputType = formatType($("#type").val());
-		// let url = 'https://crossorigin.me/https://maps.googleapis.com/maps/api/geocode/json';
 		let url = 'https://maps.googleapis.com/maps/api/geocode/json';
 		$.ajax({
 			async: true,
@@ -104,9 +98,9 @@ $(document).ready(function () {
 			type: 'GET',
 			data: {
 				address: inputAddress,
-				key: 'AIzaSyCIegMYBA5X870rGRqwORr5iCgYD2BLyyE',
+				key: key,
 			},
-			success: function (data, textStatus, jqXHR) {
+			success: function (data) {
 				let myLocation = data.results[0].geometry.location;
 				initMap(myLocation, inputType);
 			},
